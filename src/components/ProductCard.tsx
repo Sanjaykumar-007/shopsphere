@@ -1,15 +1,10 @@
-interface Product {
-  id: number
-  name: string
-  price: number
-  image: string
-}
+import type { Product } from "../types/product"
 
-interface ProductCarsProps{
+interface ProductCardProps{
     product:Product
 }
 
-function ProductCard({product}:ProductCarsProps){
+function ProductCard({product}:ProductCardProps){
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition">
