@@ -1,11 +1,47 @@
 import { Link } from 'react-router-dom'
+import { useState,useEffect } from 'react'
 import ProductCard from '../components/ProductCard'
 import { products } from '../data/products'
+import api from '../services/api'
 
+interface ApiProduct {
+  id: number
+  title: string
+  price: number
+  thumbnail: string
+}
+
+interface ApiResponse {
+  products: ApiProduct[]
+}
 
 
 
 function Home() {
+
+
+ const [products, setProducts] = useState<ApiProduct[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        const response = await api.get<ApiResponse>('/products?limit=4')
+
+        console.log('Featured products:', response.data)
+
+        setProducts(response.data.products)
+      } catch (error) {
+        console.error('Featured products error:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchFeaturedProducts()
+  }, [])
+
+
   return (
     <main>
 
@@ -111,7 +147,12 @@ function Home() {
             {products.map((product) => (
               <ProductCard
                 key={product.id}
-                product={product}
+                    product={{
+      id: product.id,
+      name: product.title,
+      price: product.price,
+      image: product.thumbnail,
+    }}
               />
             ))}
 
