@@ -1,5 +1,6 @@
+
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../services/api'
 
 function Login() {
@@ -18,19 +19,35 @@ function Login() {
       setLoading(true)
       setError('')
 
-      const response = await api.post('/user/login', {
-        username,
-        password,
-      })
+      console.log('Username:', username)
+      console.log('Password:', password)
+
+      const response = await api.post(
+          'https://dummyjson.com/auth/login',
+        {
+          username,
+          password,
+            expiresInMins: 30,
+        }
+      )
 
       console.log('Login response:', response.data)
 
-      localStorage.setItem('accessToken', response.data.accessToken)
+      localStorage.setItem(
+        'accessToken',
+        response.data.accessToken
+      )
 
       navigate('/')
-    } catch (error) {
-      console.error('Login error:', error)
-      setError('Invalid username or password')
+    } catch (error: any) {
+      console.error(
+        'Login error:',
+        error.response?.data
+      )
+
+      setError(
+        error.response?.data?.message || 'Login failed'
+      )
     } finally {
       setLoading(false)
     }
@@ -62,7 +79,9 @@ function Login() {
             <input
               type="text"
               value={username}
-              onChange={(event) => setUsername(event.target.value)}
+              onChange={(event) =>
+                setUsername(event.target.value)
+              }
               placeholder="Enter username"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:border-blue-600"
             />
@@ -76,7 +95,9 @@ function Login() {
             <input
               type="password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(event) =>
+                setPassword(event.target.value)
+              }
               placeholder="Enter password"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:border-blue-600"
             />
@@ -95,6 +116,17 @@ function Login() {
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Don't have an account?{' '}
+
+            <Link
+              to="/register"
+              className="text-blue-600 font-semibold hover:underline"
+            >
+              Register
+            </Link>
+          </p>
 
         </form>
 

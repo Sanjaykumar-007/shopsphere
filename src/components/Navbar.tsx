@@ -1,9 +1,19 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(
     Boolean(localStorage.getItem('accessToken'))
+  )
+
+  const cartItems = useSelector(
+    (state: any) => state.cart.items
+  )
+
+  const cartCount = cartItems.reduce(
+    (total: number, item: any) => total + item.quantity,
+    0
   )
 
   const handleLogout = () => {
@@ -43,6 +53,11 @@ function Navbar() {
             className="text-gray-700 hover:text-blue-600"
           >
             Cart
+            {cartCount > 0 && (
+              <span className="ml-1 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+                {cartCount}
+              </span>
+            )}
           </Link>
 
           {isLoggedIn ? (
@@ -62,7 +77,6 @@ function Navbar() {
           )}
 
         </div>
-
       </div>
     </nav>
   )

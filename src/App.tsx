@@ -8,6 +8,8 @@ import Navbar from './components/Navbar'
 import ProductDetails from './pages/ProductDetails'
 import Checkout from './pages/Checkout'
 import OrderSuccess from './pages/OrderSuccess'
+import ProtectedRoute from './components/ProtectedRoute'
+import Register from './pages/Register'
 
 function App() {
   return (
@@ -19,8 +21,17 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<Login />} />
         <Route path="/products/:id" element={<ProductDetails />} />
-         <Route path="/checkout" element={<Checkout />} />
+      
+        <Route
+          path="/checkout"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
          <Route path="/order-success" element={<OrderSuccess />} />
+         <Route path="/register" element={<Register/>}  />
       </Routes>
     </BrowserRouter>
   )

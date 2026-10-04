@@ -1,6 +1,10 @@
+import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { useParams,Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+
 import api from '../services/api'
+import { addToCart } from '../store/cartSlice'
 
 interface Product {
   id: number
@@ -13,18 +17,23 @@ interface Product {
 
 function ProductDetails() {
   const { id } = useParams()
+
+  const dispatch = useDispatch()
+
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [added, setAdded] = useState(false)
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true)
+        setError('')
 
-        const response = await api.get<Product>(`/products/${id}`)
-
-        console.log('Product details response:', response.data)
+        const response = await api.get<Product>(
+          `/products/${id}`
+        )
 
         setProduct(response.data)
       } catch (error) {
@@ -38,9 +47,31 @@ function ProductDetails() {
     fetchProduct()
   }, [id])
 
+  const handleAddToCart = () => {
+    if (!product) {
+      return
+    }
+
+    dispatch(
+      addToCart({
+        id: product.id,
+        name: product.title,
+        price: product.price,
+        image: product.thumbnail,
+        quantity: 1,
+      })
+    )
+
+    setAdded(true)
+
+    setTimeout(() => {
+      setAdded(false)
+    }, 1500)
+  }
+
   if (loading) {
     return (
-      <main className="max-w-7xl mx-auto px-6 py-12">
+      <main className="max-w-7xl mx-auto px-6 py-16">
         <p className="text-center text-gray-500">
           Loading product...
         </p>
@@ -50,7 +81,7 @@ function ProductDetails() {
 
   if (error) {
     return (
-      <main className="max-w-7xl mx-auto px-6 py-12">
+      <main className="max-w-7xl mx-auto px-6 py-16">
         <p className="text-center text-red-600">
           {error}
         </p>
@@ -60,7 +91,7 @@ function ProductDetails() {
 
   if (!product) {
     return (
-      <main className="max-w-7xl mx-auto px-6 py-12">
+      <main className="max-w-7xl mx-auto px-6 py-16">
         <p className="text-center text-gray-500">
           Product not found
         </p>
@@ -71,20 +102,20 @@ function ProductDetails() {
   return (
     <main className="max-w-7xl mx-auto px-6 py-12">
 
-     <Link
-  to="/products"
-  className="inline-block mb-8 text-blue-600 font-semibold hover:text-blue-700"
->
-  ← Back to Products
-</Link>
+      <Link
+        to="/products"
+        className="text-blue-600 hover:underline"
+      >
+        ← Back to Products
+      </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-8">
 
         <div>
           <img
             src={product.thumbnail}
             alt={product.title}
-            className="w-full rounded-xl"
+            className="w-full h-[500px] object-cover rounded-xl"
           />
         </div>
 
@@ -94,7 +125,7 @@ function ProductDetails() {
             {product.title}
           </h1>
 
-          <p className="text-2xl font-bold text-blue-600 mt-4">
+          <p className="text-blue-600 text-3xl font-bold mt-5">
             ₹{product.price}
           </p>
 
@@ -102,15 +133,23 @@ function ProductDetails() {
             {product.description}
           </p>
 
-          <p className="text-gray-700 mt-4">
+          <p className="text-yellow-500 font-semibold mt-5">
             ⭐ {product.rating}
           </p>
 
-          <button className="mt-8 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-            Add to Cart
+          <button
+            onClick={handleAddToCart}
+            className={`w-full mt-8 text-white py-3 rounded-lg font-semibold transition ${
+              added
+                ? 'bg-green-600'
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+          >
+            {added ? '✓ Added to Cart' : 'Add to Cart'}
           </button>
 
         </div>
+
       </div>
 
     </main>
